@@ -7,6 +7,11 @@
 
 function pause() {
 	paused = !paused;
+	if (pauseButton.textContent === 'Pause') {
+		pauseButton.textContent = 'Resume';
+	} else {
+		pauseButton.textContent = 'Pause';
+	}
 }
 
 function advanceFrame(frames) {
@@ -169,11 +174,15 @@ var pauseButton = document.querySelector("#pause-button");
 var incrementButtonS = document.querySelector("#incrementbuttonA");
 var incrementButtonM = document.querySelector("#incrementbuttonB");
 var incrementButtonL = document.querySelector("#incrementbuttonC");
+var resetButton = document.querySelector("#resetbutton"); 
 addButton.addEventListener('click',add);
 pauseButton.addEventListener('click', pause);
 incrementButtonS.addEventListener('click', advanceFrame.bind(null, 1));
 incrementButtonM.addEventListener('click', advanceFrame.bind(null, 10));
 incrementButtonL.addEventListener('click', advanceFrame.bind(null, 20));
+resetButton.addEventListener('click', function () {
+	circles = [];
+})
 
 
 setInterval(engine, tickTime);	

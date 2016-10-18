@@ -4,7 +4,8 @@
 	<title></title>
 	<style type="text/css">
 		canvas { 
-			background: #eeeeee; display: block; margin: 0 auto; 
+			background: #eeeeee; 
+			display: block; margin: 0 auto; 
 			margin-top: 50px;
 		}
 		* {
@@ -18,26 +19,40 @@
 			margin: 0 auto;
 			font-size: 20px;
 			font-family: sans-serif;
+			background-color: black;
+			color: white;
+		}
+
+		#controls-wrapper {
+			width: 800px;
+			margin: 30px auto;
 		}
 
 		#button-wrapper {
 			width: 600px;
-			margin: 100px auto;
+			float: left;
 		}
+
+		#resetbutton {
+			width: 140px;
+			display: block;
+			float: right;
+		}
+
 	</style>
 </head>
 <body>
-	 <canvas id="myCanvas" width="800" height="600">Here is some text.</canvas>
-	 <div id="xpos"></div>
-	 <div id="xpos"></div>
-	 <div id="button-wrapper">
-	 	 <button id="add-button">Add</button>
-		 <button id="pause-button">Pause</button>
-		 <button id="incrementbuttonA">></button>
-		 <button id="incrementbuttonB">>></button>
-		 <button id="incrementbuttonC">>>></button>
-	 </div>
-	
+	<canvas id="myCanvas" width="800" height="600">Here is some text.</canvas>
+	<div id="controls-wrapper">
+		<div id="button-wrapper">
+			<button id="add-button">Add</button>
+			<button id="pause-button">Pause</button>
+			<button id="incrementbuttonA">></button>
+			<button id="incrementbuttonB">>></button>
+			<button id="incrementbuttonC">>>></button>
+		</div>
+		<button id="resetbutton">Reset</button>
+	</div>
 
 
 	 <script type="text/javascript" src="main.js"></script>
