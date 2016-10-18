@@ -4,20 +4,23 @@
 //  3. Make more randomX and randomY generation less bad
 
 
-var canvas = document.getElementById('myCanvas');
-var ctx = canvas.getContext("2d");
-var x = 20;
-var y = 20;
-var tickTime = 10;
 
-screenWidth = document.getElementById('myCanvas').getAttribute('width');
-screenHeight = document.getElementById('myCanvas').getAttribute('height');
+function pause() {
+	paused = !paused;
+}
+
+function advanceFrame(frames) {
+	for ( var i = 0 ; i < frames ; i++) {
+		engine();
+		updatePositions(circles);
+	}
+}
 
 function square (x) {
 	return x*x;
 }
 
-function distance(a, b) {
+function dist(a, b) {
 	return Math.sqrt(square(a.xpos - b.xpos) + (square(a.ypos - b.ypos))); 
 }
 
@@ -32,6 +35,10 @@ function checkColliding(a, b) {
 	}
 }
 
+// function resolveCollisions(a,b) {
+
+// }
+
 function checkBounds () {
 	for (var i = 0; i < circles.length; i++) {
 	    if (circles[i].xpos >= canvas.width - circles[i].radius || circles[i].xpos <= circles[i].radius) {	
@@ -41,12 +48,14 @@ function checkBounds () {
 	    	if (circles[i].yvel > 0) {
 	    		circles[i].yvel = -circles[i].yvel * 0.7;
 	    	}
+	    }
 	   	if (circles[i].yvel < 50) {
 	   		// circles[i].yvel = 0;
 	   	}
     }
-  }
+  
 }
+
 
 // function checkCollisions() {
 // 	for(var i = 0; i < circles.length; i++) {
@@ -77,14 +86,8 @@ function updatePositions (entities) {
 		entities[i].ypos += entities[i].yvel * (tickTime/1000);
 		entities[i].xvel += entities[i].xa * (tickTime/1000);
 		entities[i].yvel += entities[i].ya * (tickTime/1000);
-  }
+ 	}
 }
-
-
-var circles = [];
-
-
-
 
 function add() {
 	var randomR = Math.floor(Math.random() * 60) + 10;
@@ -92,8 +95,6 @@ function add() {
   	var randomY = Math.floor(Math.random() * screenHeight);
   	var randomXV = Math.floor(Math.random() * 300) + 1;
   	var randomYV = Math.floor(Math.random() * 300) + 1;
-
-
 
 	// Ensure circles do not spawn clipping screen borders
 	randomX += randomR;
@@ -104,14 +105,11 @@ function add() {
   	if (randomY + randomR > screenHeight) {
   		randomY -= randomR*2;
   	}
-}
-
-
 
   	// var randomXA = Math.floor(Math.random() * 300);
   	// var randomYA = Math.floor(Math.random() * 300);
   	circles.push({
-  			radius: 10,
+  			radius: randomR,
 			xpos: 200,
 		    ypos: 200,
 		    xvel: randomXV,
@@ -122,7 +120,6 @@ function add() {
   	});
 }
 
-
 function engine() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -130,39 +127,54 @@ function engine() {
 	for ( var i = 0; i < circles.length; i++) {
   		drawCircle(i);
   	}
- 
-	updatePositions(circles);	
+  	if (!paused) {
+		updatePositions(circles);	
+  	}
   	checkBounds();
 
+	// THIS WORKS AND IS SO GREAT
+	// for ( var i = 0 ; i < circles.length ; i++ ) {
+	// 	for (var j = 0 ; j < circles.length ; j++ ) {
+	// 		if (i === j) {
+	// 			break;
+	// 		}
+	// 		if (checkCollisions(circles[i], circles[j])) {
+	// 			// resolveCollisions
+	// 		}
+	// 	}
+	// }
 
-// THIS WORKS AND IS SO GREAT
-// for ( var i = 0 ; i < circles.length ; i++ ) {
-// 	for (var j = 0 ; j < circles.length ; j++ ) {
-// 		if (i === j) {
-// 			break;
-// 		}
-// 		if (checkCollisions(circles[i], circles[j])) {
-// 			// resolveCollisions
-// 		}
-// 	}
-// }
-
-// THIS IS ALSO WORKS AND IS GREAT
-for ( var i = 0 ; i < circles.length ; i++ ) {
-	for (var j = i + 1 ; j < circles.length ; j++ ) {
-		if (checkCollisions(circles[i], circles[j])) {
-			// resolveCollisions
+	// THIS ALSO WORKS AND IS GREAT
+	for ( var i = 0 ; i < circles.length ; i++ ) {
+		for (var j = i + 1 ; j < circles.length ; j++ ) {
+			if (checkColliding(circles[i], circles[j])) {
+				// resolveCollisions(circles[i], circles[j]);
+			}
 		}
 	}
 }
+var canvas = document.getElementById('myCanvas');
+var ctx = canvas.getContext("2d");
+var y = 20;
+var tickTime = 10; // Changing this to 30 makes balls bounce forever
+var circles = [];
+var paused = false;
 
 
-add();
+var screenWidth = document.getElementById('myCanvas').getAttribute('width');
+var screenHeight = document.getElementById('myCanvas').getAttribute('height');
+
+var addButton = document.querySelector("#add-button");
+var pauseButton = document.querySelector("#pause-button");
+var incrementButtonS = document.querySelector("#incrementbuttonA");
+var incrementButtonM = document.querySelector("#incrementbuttonB");
+var incrementButtonL = document.querySelector("#incrementbuttonC");
+addButton.addEventListener('click',add);
+pauseButton.addEventListener('click', pause);
+incrementButtonS.addEventListener('click', advanceFrame.bind(null, 1));
+incrementButtonM.addEventListener('click', advanceFrame.bind(null, 10));
+incrementButtonL.addEventListener('click', advanceFrame.bind(null, 20));
 
 
-setInterval(engine, tickTime);
-// setInterval(add, 1000);
-
-
-
+setInterval(engine, tickTime);	
 
