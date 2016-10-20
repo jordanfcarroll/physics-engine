@@ -2,6 +2,7 @@
 //  1. Collision resolver
 //  2. Friction
 //  3. Make more randomX and randomY generation less bad
+// 4. Fix top border collisions
 
 
 
@@ -44,15 +45,22 @@ function checkColliding(a, b) {
 
 // }
 
+function addGravity(x,y) {
+	circles.forEach(function(value) {
+		value.xa = x;
+		value.ya = y;
+	});
+}
+
 function checkBounds () {
 	for (var i = 0; i < circles.length; i++) {
 	    if (circles[i].xpos >= canvas.width - circles[i].radius || circles[i].xpos <= circles[i].radius) {	
 	      	circles[i].xvel = -circles[i].xvel * 0.8;
 	    }
-	    if (circles[i].ypos >= canvas.height - circles[i].radius || circles[i].ypos <= circles[i].radius) {
-	    	if (circles[i].yvel > 0) {
-	    		circles[i].yvel = -circles[i].yvel * 0.7;
-	    	}
+	    if (circles[i].ypos >= canvas.height - circles[i].radius || circles[i].ypos < circles[i].radius) {
+	    	// if (circles[i].yvel > 0) {
+	    		circles[i].yvel = -circles[i].yvel * 0.8;
+	    	// }
 	    }
 	   	if (circles[i].yvel < 50) {
 	   		// circles[i].yvel = 0;
@@ -120,7 +128,7 @@ function add() {
 		    xvel: randomXV,
 		    yvel: randomYV,
 		    xa: 0,
-		    ya: 1200,
+		    ya: 0,
 		    color: 'black'
   	});
 }
@@ -175,6 +183,11 @@ var incrementButtonS = document.querySelector("#incrementbuttonA");
 var incrementButtonM = document.querySelector("#incrementbuttonB");
 var incrementButtonL = document.querySelector("#incrementbuttonC");
 var resetButton = document.querySelector("#resetbutton"); 
+var gravUpButton = document.querySelector("#gravityup")
+var gravDownButton = document.querySelector("#gravitydown")
+var gravRightButton = document.querySelector("#gravityright")
+var gravLeftButton = document.querySelector("#gravityleft")
+var gravDisableButton = document.querySelector("#gravitydisable")
 addButton.addEventListener('click',add);
 pauseButton.addEventListener('click', pause);
 incrementButtonS.addEventListener('click', advanceFrame.bind(null, 1));
@@ -183,6 +196,11 @@ incrementButtonL.addEventListener('click', advanceFrame.bind(null, 20));
 resetButton.addEventListener('click', function () {
 	circles = [];
 })
+gravRightButton.addEventListener("click", addGravity.bind(null, 1200, 0));
+gravLeftButton.addEventListener("click", addGravity.bind(null, -1200, 0));
+gravUpButton.addEventListener("click", addGravity.bind(null, 0, -1200));
+gravDownButton.addEventListener("click", addGravity.bind(null, 0, 1200));
+gravDisableButton.addEventListener("click", addGravity.bind(null,1200, 0));
 
 
 setInterval(engine, tickTime);	
