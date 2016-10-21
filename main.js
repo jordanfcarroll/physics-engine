@@ -1,9 +1,8 @@
 //  TO DO 
-//  1. Collision resolver
+//  1. Collision resolver is bad - make better
 //  2. Friction
 //  3. Make more randomX and randomY generation less bad
-// 4. Fix top border collisions
-
+//  4. Fix gravity adding -- gravity object?
 
 
 function pause() {
@@ -41,9 +40,23 @@ function checkColliding(a, b) {
 	}
 }
 
-// function resolveCollisions(a,b) {
+function resolveColliding(a,b) {
+	correctedDistance = a.radius + b.radius;
+	currentDistance = dist(a,b);
+	offset = correctedDistance - currentDistance;
+	var placeholder = a.xvel;
+	a.xvel = b.xvel;
+	b.xvel = placeholder;
 
-// }
+	placeholder = a.yvel;
+	a.yvel = b.yvel;
+	b.yvel = placeholder;
+
+	a.ypos += a.yvel * (tickTime/1000);
+	a.xpos += a.xvel * (tickTime/1000);
+	b.ypos += b.yvel * (tickTime/1000);
+	b.ypos += b.yvel * (tickTime/1000);
+}
 
 function addGravity(x,y) {
 	circles.forEach(function(value) {
@@ -53,37 +66,45 @@ function addGravity(x,y) {
 }
 
 function checkBounds () {
-	for (var i = 0; i < circles.length; i++) {
-	    if (circles[i].xpos >= canvas.width - circles[i].radius || circles[i].xpos <= circles[i].radius) {	
-	      	circles[i].xvel = -circles[i].xvel * 0.8;
-	    }
-	    if (circles[i].ypos >= canvas.height - circles[i].radius || circles[i].ypos < circles[i].radius) {
-	    	// if (circles[i].yvel > 0) {
-	    		circles[i].yvel = -circles[i].yvel * 0.8;
-	    	// }
-	    }
-	   	if (circles[i].yvel < 50) {
-	   		// circles[i].yvel = 0;
-	   	}
-    }
-  
+	for (var i = 0 ; i < circles.length ; i++) {
+		if (circles[i].xpos >= canvas.width - circles[i].radius) {
+			let offset = canvas.width - circles[i].radius - circles[i].xpos;
+			circles[i].xpos += offset*2;
+			circles[i].xvel = Math.floor(-circles[i].xvel) * 0.8;
+			if (Math.abs(circles[i].xvel) < STICKY_THRESHOLD) {
+				circles[i].xvel = 0;
+			}
+		}
+
+		if (circles[i].xpos <= circles[i].radius) {
+			let offset = circles[i].radius - circles[i].xpos;
+			circles[i].xpos += offset*2;
+			circles[i].xvel = Math.floor(-circles[i].xvel) * 0.8;
+			if (Math.abs(circles[i].xvel) < STICKY_THRESHOLD) {
+				circles[i].xvel = 0;
+			}
+		}
+
+		if (circles[i].ypos <= circles[i].radius) {
+			let offset = circles[i].radius - circles[i].ypos;
+			circles[i].ypos += (offset*2);
+			circles[i].yvel = Math.floor(-circles[i].yvel) * 0.8;
+			if (Math.abs(circles[i].yvel) < STICKY_THRESHOLD) {
+				circles[i].yvel = 0;
+			}
+		}
+
+		if (circles[i].ypos >= canvas.height - circles[i].radius) {
+			let offset = canvas.height - circles[i].radius - circles[i].ypos;
+			circles[i].ypos += offset*2;
+			circles[i].yvel = Math.floor(-circles[i].yvel) * 0.8;
+			// if (Math.abs(circles[i].yvel) < STICKY_THRESHOLD) {
+			// 	circles[i].yvel = 0;
+			// }
+		}
+	}   
 }
 
-
-// function checkCollisions() {
-// 	for(var i = 0; i < circles.length; i++) {
-// 	  	for(var j = 0; j < circles.length; j++) {
-//       	var xdiff = circles[i].xpos - circles[j].xpos;
-//         var ydiff = circles[i].ypos - circles[j].ypos;
-// 	    	if(xdiff <= (circles[i].radius + circles[j].radius) && xdiff >= 0 && ydiff <= (circles[i].radius + circles[j].radius) && ydiff >= 0 && i !== j) {
-// 				circles[i].xvel = circles[i].xvel - (circles[i].xvel * 2);
-// 	      		circles[i].yvel = circles[i].yvel - (circles[i].yvel * 2);
-//             	circles[j].xvel = circles[j].xvel - (circles[j].xvel * 2);
-// 	      		circles[j].yvel = circles[j].yvel - (circles[j].yvel * 2);
-// 	        }
-// 	    }
-//   	}
-// }
 
 function drawCircle (a) {
 	ctx.beginPath();
@@ -122,9 +143,9 @@ function add() {
   	// var randomXA = Math.floor(Math.random() * 300);
   	// var randomYA = Math.floor(Math.random() * 300);
   	circles.push({
-  			radius: randomR,
-			xpos: 200,
-		    ypos: 200,
+  			radius: 50,
+			xpos: randomX,
+		    ypos: randomY,
 		    xvel: randomXV,
 		    yvel: randomYV,
 		    xa: 0,
@@ -140,9 +161,8 @@ function engine() {
 	for ( var i = 0; i < circles.length; i++) {
   		drawCircle(i);
   	}
-  	if (!paused) {
-		updatePositions(circles);	
-  	}
+
+	updatePositions(circles);
   	checkBounds();
 
 	// THIS WORKS AND IS SO GREAT
@@ -161,7 +181,8 @@ function engine() {
 	for ( var i = 0 ; i < circles.length ; i++ ) {
 		for (var j = i + 1 ; j < circles.length ; j++ ) {
 			if (checkColliding(circles[i], circles[j])) {
-				// resolveCollisions(circles[i], circles[j]);
+				// resolveColliding(circles[i], circles[j]);
+				resolveColliding(circles[i], circles[j])
 			}
 		}
 	}
@@ -176,6 +197,8 @@ var paused = false;
 
 var screenWidth = document.getElementById('myCanvas').getAttribute('width');
 var screenHeight = document.getElementById('myCanvas').getAttribute('height');
+var STICKY_THRESHOLD = 60;
+
 
 var addButton = document.querySelector("#add-button");
 var pauseButton = document.querySelector("#pause-button");
@@ -203,5 +226,21 @@ gravDownButton.addEventListener("click", addGravity.bind(null, 0, 1200));
 gravDisableButton.addEventListener("click", addGravity.bind(null,1200, 0));
 
 
-setInterval(engine, tickTime);	
+// setInterval(engine, tickTime);	
 
+setInterval(function () {
+	if (!paused) {
+		engine();
+	}
+}, tickTime);
+
+// var pt = new Date();
+
+// requestAnimationFrame(function () {
+// 	var ct = new Date();
+// 	var dt = ct - pt;
+// 	if (!paused) {
+// 		engine(dt * timeModifier);
+// 	}
+// 	pt = ct;
+// })
